@@ -2,8 +2,8 @@ This repo is a fork from main repo and will usually have new features bundled fa
 
 # Unofficial Facebook Chat API
 
-<a href="https://www.npmjs.com/package/@xaviabot/fca-unofficial"><img alt="npm version" src="https://img.shields.io/npm/v/@xaviabot/fca-unofficial.svg?style=flat-square"></a>
-<a href="https://www.npmjs.com/package/@xaviabot/fca-unofficial"><img src="https://img.shields.io/npm/dm/@xaviabot/fca-unofficial.svg?style=flat-square" alt="npm downloads"></a>
+<a href="https://www.npmjs.com/package/@dino-vn/fca-unofficial"><img alt="npm version" src="https://img.shields.io/npm/v/@dino-vn/fca-unofficial.svg?style=flat-square"></a>
+<a href="https://www.npmjs.com/package/@dino-vn/fca-unofficial"><img src="https://img.shields.io/npm/dm/@dino-vn/fca-unofficial.svg?style=flat-square" alt="npm downloads"></a>
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Facebook now has an official API for chat bots [here](https://developers.facebook.com/docs/messenger-platform).
@@ -18,13 +18,13 @@ See the [full changelog](/CHANGELOG.md) for release details.
 
 ## Install
 
-If you just want to use @xaviabot/fca-unofficial, you should use this command:
+If you just want to use @dino-vn/fca-unofficial, you should use this command:
 
 ```bash
-npm install @xaviabot/fca-unofficial
+npm install @dino-vn/fca-unofficial
 ```
 
-It will download @xaviabot/fca-unofficial from NPM repositories
+It will download @dino-vn/fca-unofficial from NPM repositories
 
 ### Bleeding edge
 
@@ -41,7 +41,7 @@ If you want to test your bots without creating another account on Facebook, you 
 ## Example Usage
 
 ```javascript
-const login = require("@xaviabot/fca-unofficial");
+const login = require("@dino-vn/fca-unofficial");
 
 // Create simple echo bot
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
@@ -120,7 +120,7 @@ Note that a message can only be a regular message (which can be empty) and optio
 **Example (Basic Message)**
 
 ```js
-const login = require("@xaviabot/fca-unofficial");
+const login = require("@dino-vn/fca-unofficial");
 
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
     if (err) return console.error(err);
@@ -134,7 +134,7 @@ login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
 **Example (File upload)**
 
 ```js
-const login = require("@xaviabot/fca-unofficial");
+const login = require("@dino-vn/fca-unofficial");
 
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
     if (err) return console.error(err);
@@ -159,7 +159,7 @@ To avoid logging in every time you should save AppState (cookies etc.) to a file
 
 ```js
 const fs = require("fs");
-const login = require("@xaviabot/fca-unofficial");
+const login = require("@dino-vn/fca-unofficial");
 
 var credentials = { email: "FB_EMAIL", password: "FB_PASSWORD" };
 
@@ -184,7 +184,7 @@ Listen watches for messages sent in a chat. By default this won't receive events
 
 ```js
 const fs = require("fs");
-const login = require("@xaviabot/fca-unofficial");
+const login = require("@dino-vn/fca-unofficial");
 
 // Simple echo bot. It will repeat everything that you say.
 // Will stop when you say '/stop'
