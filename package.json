@@ -1,12 +1,12 @@
 {
   "name": "@dino-vn/fca-unofficial",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Facebook chat API that doesn't rely on XMPP. Will NOT be deprecated after April 30th 2015.",
   "scripts": {
     "test": "mocha",
     "lint": "./node_modules/.bin/eslint **.js",
     "prettier": "npx prettier utils.js src/* --write",
-    "publish": "npm run prettier && git push"
+    "publish": "npm run prettier && npm publish"
   },
   "repository": {
     "type": "git",
