@@ -193,15 +193,71 @@ function buildAPI(globalOptions, html, jar) {
     api["htmlData"] = noMqttData;
   }
 
+  const apiFuncNames = [
+    "addExternalModule",
+    "addUserToGroup",
+    "changeAdminStatus",
+    "changeApprovalMode",
+    "changeArchivedStatus",
+    "changeBio",
+    "changeBlockedStatus",
+    "changeBlockedStatusMqtt",
+    "changeGroupImage",
+    "changeNickname",
+    "changeThreadColor",
+    "changeThreadEmoji",
+    "createNewGroup",
+    "createPoll",
+    "createPollMqtt",
+    "deleteMessage",
+    "deleteThread",
+    "editMessage",
+    "forwardAttachment",
+    "forwardMessage",
+    "getCurrentUserID",
+    "getEmojiUrl",
+    "getFriendsList",
+    "getThreadHistory",
+    "getThreadInfo",
+    "getThreadList",
+    "getThreadPictures",
+    "getUserID",
+    "getUserInfo",
+    "handleMessageRequest",
+    "listenMqtt",
+    "logout",
+    "markAsDelivered",
+    "markAsRead",
+    "markAsReadAll",
+    "markAsSeen",
+    "muteThread",
+    "pinMessage",
+    "removeUserFromGroup",
+    "resolvePhotoUrl",
+    "searchForThread",
+    "sendMessage",
+    "sendComment",
+    "sendTypingIndicator",
+    "setMessageReaction",
+    "setMessageReactionMqtt",
+    "setTitle",
+    "setTheme",
+    "threadColors",
+    "unsendMessage",
+    "unsendMessageMqtt",
+    "unfriend",
+
+    // HTTP
+    "httpGet",
+    "httpPost",
+  ];
+
   var defaultFuncs = utils.makeDefaults(html, userID, ctx);
 
-  var modules = fs.readdirSync("./src").filter((file) => file.endsWith(".js"));
-
-  for (let module of modules) {
-    let moduleName = module.replace(".js", "");
-    let moduleFunc = require(`./src/${moduleName}`);
-    api[moduleName] = moduleFunc(defaultFuncs, api, ctx);
-  }
+  // Load all api functions in a loop
+  apiFuncNames.map(function(v) {
+    api[v] = require("./src/" + v)(defaultFuncs, api, ctx);
+  });
 
   //Removing original `listen` that uses pull.
   //Map it to listenMqtt instead for backward compatibly.
