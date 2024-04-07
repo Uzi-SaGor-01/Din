@@ -1,7 +1,9 @@
 {
-  "name": "@dino-vn/fca-unofficial",
+  "name": "dinovn-fca",
   "version": "1.0.0",
   "description": "A Facebook chat API that doesn't rely on XMPP. Will NOT be deprecated after April 30th 2015.",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "mocha",
     "lint": "./node_modules/.bin/eslint **.js",
@@ -39,40 +41,5 @@
     "eslint": "^7.5.0",
     "mocha": "^10.2.0",
     "prettier": "3.2.5"
-  },
-  "eslintConfig": {
-    "env": {
-      "es6": true,
-      "es2017": true,
-      "node": true
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-      "sourceType": "module"
-    },
-    "rules": {
-      "linebreak-style": [
-        "error",
-        "unix"
-      ],
-      "semi": [
-        "error",
-        "always"
-      ],
-      "no-unused-vars": [
-        1,
-        {
-          "argsIgnorePattern": "^_",
-          "varsIgnorePattern": "^_"
-        }
-      ],
-      "no-empty": [
-        "error",
-        {
-          "allowEmptyCatch": true
-        }
-      ]
-    }
-  },
-  "types": "index.d.ts"
+  }
 }

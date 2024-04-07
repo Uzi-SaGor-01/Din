@@ -1,6 +1,6 @@
 // Origin: NOCOM-BOT/mod_fbmsg_legacy
 
-declare module '@dino-vn/fca-unofficial' {
+declare module 'dinovn-fca' {
     import type { Readable, Duplex, Transform } from "stream";
     import type EventEmitter from "events";
 

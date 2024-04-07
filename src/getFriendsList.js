@@ -1,7 +1,7 @@
 "use strict";
 
 //var cheerio = require("cheerio");
-var utils = require("@dino-vn/fca-unofficial/utils");
+var utils = require("dinovn-fca/utils");
 var log = require("npmlog");
 
 // [almost] copy pasted from one of FB's minified file (GenderConst)

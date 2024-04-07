@@ -16,7 +16,7 @@ var options = {
   logLevel: "silent",
   pageID: conf.pageID
 };
-var getType = require('@dino-vn/fca-unofficial/utils').getType;
+var getType = require('dinovn-fca/utils').getType;
 
 var userID = conf.user.id;
 

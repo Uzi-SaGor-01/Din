@@ -1,6 +1,6 @@
 "use strict";
 
-var utils = require("@dino-vn/fca-unofficial/utils");
+var utils = require("dinovn-fca/utils");
 var log = require("npmlog");
 var bluebird = require("bluebird");
 

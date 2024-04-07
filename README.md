@@ -2,8 +2,8 @@ This repo is a fork from main repo and will usually have new features bundled fa
 
 # Unofficial Facebook Chat API
 
-<a href="https://www.npmjs.com/package/@dino-vn/fca-unofficial"><img alt="npm version" src="https://img.shields.io/npm/v/@dino-vn/fca-unofficial.svg?style=flat-square"></a>
-<a href="https://www.npmjs.com/package/@dino-vn/fca-unofficial"><img src="https://img.shields.io/npm/dm/@dino-vn/fca-unofficial.svg?style=flat-square" alt="npm downloads"></a>
+<a href="https://www.npmjs.com/package/dinovn-fca"><img alt="npm version" src="https://img.shields.io/npm/v/dinovn-fca.svg?style=flat-square"></a>
+<a href="https://www.npmjs.com/package/dinovn-fca"><img src="https://img.shields.io/npm/dm/dinovn-fca.svg?style=flat-square" alt="npm downloads"></a>
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Facebook now has an official API for chat bots [here](https://developers.facebook.com/docs/messenger-platform).
@@ -14,24 +14,22 @@ _Disclaimer_: We are not responsible if your account gets banned for spammy acti
 
 See [below](#projects-using-this-api) for projects using this API.
 
-See the [full changelog](/CHANGELOG.md) for release details.
-
 ## Install
 
-If you just want to use @dino-vn/fca-unofficial, you should use this command:
+If you just want to use dinovn-fca, you should use this command:
 
 ```bash
-npm install @dino-vn/fca-unofficial
+npm install dinovn-fca
 ```
 
-It will download @dino-vn/fca-unofficial from NPM repositories
+It will download dinovn-fca from NPM repositories
 
 ### Bleeding edge
 
 If you want to use bleeding edge (directly from github) to test new features or submit bug report, this is the command for you:
 
 ```bash
-npm install XaviaTeam/fca-unofficial
+npm install Dino-VN/fca-unofficial
 ```
 
 ## Testing your bots
@@ -41,7 +39,7 @@ If you want to test your bots without creating another account on Facebook, you 
 ## Example Usage
 
 ```javascript
-const login = require("@dino-vn/fca-unofficial");
+const login = require("dinovn-fca");
 
 // Create simple echo bot
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
@@ -120,7 +118,7 @@ Note that a message can only be a regular message (which can be empty) and optio
 **Example (Basic Message)**
 
 ```js
-const login = require("@dino-vn/fca-unofficial");
+const login = require("dinovn-fca");
 
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
     if (err) return console.error(err);
@@ -134,7 +132,7 @@ login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
 **Example (File upload)**
 
 ```js
-const login = require("@dino-vn/fca-unofficial");
+const login = require("dinovn-fca");
 
 login({ email: "FB_EMAIL", password: "FB_PASSWORD" }, (err, api) => {
     if (err) return console.error(err);
@@ -159,7 +157,7 @@ To avoid logging in every time you should save AppState (cookies etc.) to a file
 
 ```js
 const fs = require("fs");
-const login = require("@dino-vn/fca-unofficial");
+const login = require("dinovn-fca");
 
 var credentials = { email: "FB_EMAIL", password: "FB_PASSWORD" };
 
@@ -184,7 +182,7 @@ Listen watches for messages sent in a chat. By default this won't receive events
 
 ```js
 const fs = require("fs");
-const login = require("@dino-vn/fca-unofficial");
+const login = require("dinovn-fca");
 
 // Simple echo bot. It will repeat everything that you say.
 // Will stop when you say '/stop'
