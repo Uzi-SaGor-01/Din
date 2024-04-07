@@ -1,6 +1,6 @@
 "use strict";
 
-var utils = require("../utils");
+var utils = require("@dino-vn/fca-unofficial/utils");
 var log = require("npmlog");
 
 module.exports = function (defaultFuncs, api, ctx) {
@@ -50,7 +50,7 @@ module.exports = function (defaultFuncs, api, ctx) {
           .post(
             "https://www.facebook.com/ajax/messaging/typ.php",
             ctx.jar,
-            form,
+            form
           )
           .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
           .then(function (resData) {
@@ -74,7 +74,7 @@ module.exports = function (defaultFuncs, api, ctx) {
     }
   }
 
-  return function sendTypingIndicator(threadID, callback, isGroup) {
+  function sendTypingIndicatorNoMqtt(threadID, callback, isGroup) {
     if (
       utils.getType(callback) !== "Function" &&
       utils.getType(callback) !== "AsyncFunction"
@@ -82,7 +82,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       if (callback) {
         log.warn(
           "sendTypingIndicator",
-          "callback is not a function - ignoring.",
+          "callback is not a function - ignoring."
         );
       }
       callback = () => {};
@@ -98,7 +98,7 @@ module.exports = function (defaultFuncs, api, ctx) {
         if (cb) {
           log.warn(
             "sendTypingIndicator",
-            "callback is not a function - ignoring.",
+            "callback is not a function - ignoring."
           );
         }
         cb = () => {};
@@ -106,5 +106,72 @@ module.exports = function (defaultFuncs, api, ctx) {
 
       makeTypingIndicator(false, threadID, cb, isGroup);
     };
+  }
+
+  function sendTypingIndicatorMqtt(isTyping, threadID, callback) {
+    if (!ctx.mqttClient) {
+      throw new Error("Not connected to MQTT");
+    }
+
+    ctx.wsReqNumber += 1;
+
+    api
+      .getThreadInfo(threadID)
+      .then((threadData) => {
+        const label = "3";
+        const isGroupThread = threadData.isGroup ? 1 : 0;
+        const attribution = 0;
+
+        const taskPayload = {
+          thread_key: threadID,
+          is_group_thread: isGroupThread,
+          is_typing: isTyping ? 1 : 0,
+          attribution: attribution,
+        };
+
+        const payload = JSON.stringify(taskPayload);
+        const version = "25393437286970779";
+
+        const content = {
+          app_id: "2220391788200892",
+          payload: JSON.stringify({
+            label: label,
+            payload: payload,
+            version: version,
+          }),
+          request_id: ctx.wsReqNumber,
+          type: 4,
+        };
+
+        if (typeof callback == "function") {
+          // to be implemented
+        }
+
+        ctx.mqttClient.publish("/ls_req", JSON.stringify(content), {
+          qos: 1,
+          retain: false,
+        });
+      })
+      .catch((error) => {
+        // console.error(error);
+        // throw new Error("Failed to get thread info");
+      });
+  }
+
+  return function sendTypingIndicator(threadID, callback, delay, isGroup) {
+    if (ctx.mqttClient) {
+      if (typeof callback !== "function") delay = callback;
+      try {
+        sendTypingIndicatorMqtt(true, threadID, callback);
+        setTimeout(function () {
+          sendTypingIndicatorMqtt(false, threadID, () => {});
+        }, delay ? delay : 30 * 1000);
+        callback();
+      } catch (e) {
+        // console.error(e);
+        sendTypingIndicatorNoMqtt(threadID, callback, isGroup);
+      }
+    }
+    else sendTypingIndicatorNoMqtt(threadID, callback, isGroup);
   };
 };

@@ -3,6 +3,7 @@
 var utils = require("./utils");
 var cheerio = require("cheerio");
 var log = require("npmlog");
+var fs = require("fs");
 
 var checkVerified = null;
 
@@ -192,76 +193,15 @@ function buildAPI(globalOptions, html, jar) {
     api["htmlData"] = noMqttData;
   }
 
-  const apiFuncNames = [
-    "addExternalModule",
-    "addUserToGroup",
-    "changeAdminStatus",
-    "changeApprovalMode",
-    "changeArchivedStatus",
-    "changeBio",
-    "changeBlockedStatus",
-    "changeBlockedStatusMqtt",
-    "changeGroupImage",
-    "changeNickname",
-    "changeThreadColor",
-    "changeThreadEmoji",
-    "createNewGroup",
-    "createPoll",
-    "createPollMqtt",
-    "deleteMessage",
-    "deleteThread",
-    "editMessage",
-    "forwardAttachment",
-    "forwardMessage",
-    "getCurrentUserID",
-    "getEmojiUrl",
-    "getFriendsList",
-    "getThreadHistory",
-    "getThreadInfo",
-    "getThreadList",
-    "getThreadPictures",
-    "getUserID",
-    "getUserInfo",
-    "handleMessageRequest",
-    "listenMqtt",
-    "logout",
-    "markAsDelivered",
-    "markAsRead",
-    "markAsReadAll",
-    "markAsSeen",
-    "muteThread",
-    "pinMessage",
-    "removeUserFromGroup",
-    "resolvePhotoUrl",
-    "searchForThread",
-    "sendMessage",
-    "sendTypingIndicator",
-    "sendTypingIndicatorMqtt",
-    "setMessageReaction",
-    "setMessageReactionMqtt",
-    "setTitle",
-    "setTheme",
-    "threadColors",
-    "unsendMessage",
-    "unsendMessageMqtt",
-    "unfriend",
-
-    // HTTP
-    "httpGet",
-    "httpPost",
-
-    // Deprecated features
-    "getThreadListDeprecated",
-    "getThreadHistoryDeprecated",
-    "getThreadInfoDeprecated",
-  ];
-
   var defaultFuncs = utils.makeDefaults(html, userID, ctx);
 
-  // Load all api functions in a loop
-  apiFuncNames.map(function(v) {
-    api[v] = require("./src/" + v)(defaultFuncs, api, ctx);
-  });
+  var modules = fs.readdirSync("./src").filter((file) => file.endsWith(".js"));
+
+  for (let module of modules) {
+    let moduleName = module.replace(".js", "");
+    let moduleFunc = require(`./src/${moduleName}`);
+    api[moduleName] = moduleFunc(defaultFuncs, api, ctx);
+  }
 
   //Removing original `listen` that uses pull.
   //Map it to listenMqtt instead for backward compatibly.
@@ -676,50 +616,51 @@ function loginHelper(
       _defaultFuncs = stuff[1];
       api = stuff[2];
       return res;
-    });
-
-  // given a pageID we log in as a page
-  if (globalOptions.pageID) {
-    mainPromise = mainPromise
-      .then(function() {
-        return utils.get(
-          "https://www.facebook.com/" +
-            ctx.globalOptions.pageID +
-            "/messages/?section=messages&subsection=inbox",
-          ctx.jar,
-          null,
-          globalOptions
-        );
-      })
-      .then(function(resData) {
-        var url = utils
-          .getFrom(
-            resData.body,
-            'window.location.replace("https:\\/\\/www.facebook.com\\',
-            '");'
-          )
-          .split("\\")
-          .join("");
-        url = url.substring(0, url.length - 1);
-
-        return utils.get(
-          "https://www.facebook.com" + url,
-          ctx.jar,
-          null,
-          globalOptions
-        );
-      });
-  }
-
-  // At the end we call the callback or catch an exception
-  mainPromise
-    .then(function() {
-      log.info("login", "Done logging in.");
-      return callback(null, api);
     })
-    .catch(function(e) {
-      log.error("login", e.error || e);
-      callback(e);
+    .then(function(res) {
+      // given a pageID we log in as a page
+      if (globalOptions.pageID) {
+        mainPromise = mainPromise
+          .then(function() {
+            return utils.get(
+              "https://www.facebook.com/" +
+                ctx.globalOptions.pageID +
+                "/messages/?section=messages&subsection=inbox",
+              ctx.jar,
+              null,
+              globalOptions
+            );
+          })
+          .then(function(resData) {
+            var url = utils
+              .getFrom(
+                resData.body,
+                'window.location.replace("https:\\/\\/www.facebook.com\\',
+                '");'
+              )
+              .split("\\")
+              .join("");
+            url = url.substring(0, url.length - 1);
+
+            return utils.get(
+              "https://www.facebook.com" + url,
+              ctx.jar,
+              null,
+              globalOptions
+            );
+          });
+      }
+
+      // At the end we call the callback or catch an exception
+      mainPromise
+        .then(function() {
+          log.info("login", "Done logging in.");
+          return callback(null, api);
+        })
+        .catch(function(e) {
+          log.error("login", e.error || e);
+          callback(e);
+        });
     });
 }
 

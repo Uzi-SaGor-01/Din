@@ -4,7 +4,7 @@ const {
   generateOfflineThreadingID,
   getCurrentTimestamp,
   getGUID,
-} = require("../utils");
+} = require("@dino-vn/fca-unofficial/utils");
 
 function isCallable(func) {
   try {

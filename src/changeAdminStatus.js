@@ -1,6 +1,6 @@
 "use strict";
 
-const utils = require("../utils");
+const utils = require("@dino-vn/fca-unofficial/utils");
 const log = require("npmlog");
 
 module.exports = function (defaultFuncs, api, ctx) {

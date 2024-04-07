@@ -1,6 +1,6 @@
 /* eslint-disable no-redeclare */
 "use strict";
-var utils = require("../utils");
+var utils = require("@dino-vn/fca-unofficial/utils");
 var log = require("npmlog");
 var mqtt = require("mqtt");
 var websocket = require("websocket-stream");

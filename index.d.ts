@@ -1,6 +1,6 @@
 // Origin: NOCOM-BOT/mod_fbmsg_legacy
 
-declare module '@xaviabot/fca-unofficial' {
+declare module '@dino-vn/fca-unofficial' {
     import type { Readable, Duplex, Transform } from "stream";
     import type EventEmitter from "events";
 
@@ -78,7 +78,7 @@ declare module '@xaviabot/fca-unofficial' {
     export type IFCAU_API = {
         addUserToGroup: (userID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         changeAdminStatus: (threadID: string, adminIDs: string | string[], adminStatus: boolean, callback?: (err?: Error) => void) => Promise<void>,
-				changeApprovalMode: (approvalMode: 0 | 1, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+		changeApprovalMode: (approvalMode: 0 | 1, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         changeArchivedStatus: (threadOrThreads: string | string[], archive: boolean, callback?: (err?: Error) => void) => Promise<void>,
         changeBlockedStatus: (userID: string, blocked: boolean, callback?: (err?: Error) => void) => Promise<void>,
         changeBlockedStatusMqtt: (userID: string, status: boolean, type: string?, callback?: (err?: Error) => void) => Promise<void>,
@@ -120,8 +120,11 @@ declare module '@xaviabot/fca-unofficial' {
         removeUserFromGroup: (userID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         resolvePhotoUrl: (photoID: string, callback?: (err: Error | null, url: string) => void) => Promise<string>,
         sendMessage: typeof sendMessage,
-        sendTypingIndicator: (threadID: string, callback?: (err?: Error) => void) => Promise<void>,
-        sendTypingIndicatorMqtt: (isTyping: boolean, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        sendComment: (message: string | {
+            body: string,
+            attachment?: ReadableStream,
+        }, postID: string, callback?: (err?: Error) => void) => Promise<void>,
+        sendTypingIndicator: (threadID: string, callback?: (err?: Error) => void | number, delay?: number) => Promise<void>,
         setMessageReaction: (reaction: string, messageID: string, callback?: (err?: Error) => void, forceCustomReaction?: boolean) => Promise<void>,
         setMessageReactionMqtt: (reaction: string, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setOptions: (options: Partial<IFCAU_Options>) => void,

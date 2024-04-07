@@ -1,6 +1,6 @@
 "use strict";
 
-var utils = require("../utils");
+var utils = require("@dino-vn/fca-unofficial/utils");
 
 module.exports = function (defaultFuncs, api, ctx) {
   return function searchForThread(name, callback) {

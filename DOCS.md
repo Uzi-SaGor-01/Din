@@ -38,6 +38,7 @@
 -   [`api.resolvePhotoUrl`](#resolvePhotoUrl)
 -   [`api.searchForThread`](#searchForThread)
 -   [`api.sendMessage`](#sendMessage)
+-   [`api.sendComment`](#sendComment)
 -   [`api.sendTypingIndicator`](#sendTypingIndicator)
 -   [`api.setMessageReaction`](#setMessageReaction)
 -   [`api.setOptions`](#setOptions)
@@ -1781,6 +1782,67 @@ login({ email: "EMAIL", password: "PASSWORD" }, (err, api) => {
     };
     api.sendMessage(msg, yourID);
 });
+```
+
+---
+
+### api.sendComment(message, postId[, callback])
+
+Sends the given message to the postId.
+
+**Arguments**
+
+-   `message`: A string (for backward compatibility) or a message object as described below.
+-   `postId`: A string, number, or array representing a post.
+-   `callback(err, messageInfo)`: (Optional) A callback called when sending the comment is done.
+
+**Message Object**:
+
+Various types of message can be sent:
+
+-   _Regular:_ set field `body` to the desired message as a string.
+-   _File or image:_ Set field `attachment` to a readable stream or an array of readable streams.
+
+Note that a message can only be a regular message (which can be empty) and optionally one of the following: an attachment.
+
+**Example (Basic Message)**
+
+```js
+const fs = require("fs");
+const login = require("fca-unofficial");
+
+login(
+    { appState: JSON.parse(fs.readFileSync("appstate.json", "utf8")) },
+    (err, api) => {
+        if (err) return console.error(err);
+
+        var postID = "000000000000000";
+        var msg = { body: "Hey!" };
+        api.sendComment(msg, yourID);
+    }
+);
+```
+
+**Example (File upload)**
+
+```js
+const fs = require("fs");
+const login = require("fca-unofficial");
+
+login(
+    { appState: JSON.parse(fs.readFileSync("appstate.json", "utf8")) },
+    (err, api) => {
+        if (err) return console.error(err);
+
+        // This example uploads an image called image.jpg
+        var postID = "000000000000000";
+        var msg = {
+            body: "Hey!",
+            attachment: fs.createReadStream(__dirname + "/image.jpg"),
+        };
+        api.sendComment(msg, yourID);
+    }
+);
 ```
 
 ---

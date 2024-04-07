@@ -1,6 +1,6 @@
 "use strict";
 
-const utils = require("../utils");
+const utils = require("@dino-vn/fca-unofficial/utils");
 
 module.exports = function (defaultFuncs, api, ctx) {
   return function addExternalModule(moduleObj) {

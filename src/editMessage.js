@@ -1,6 +1,6 @@
 "use_strict";
 
-const { generateOfflineThreadingID } = require("../utils");
+const { generateOfflineThreadingID } = require("@dino-vn/fca-unofficial/utils");
 
 function isCallable(func) {
   try {

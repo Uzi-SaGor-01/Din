@@ -12,8 +12,8 @@ var userIDs = conf.userIDs;
 
 var options = { selfListen: true, listenEvents: true, logLevel: "silent"};
 var pageOptions = {logLevel: 'silent', pageID: conf.pageID};
-var getType = require('../utils').getType;
-var formatDeltaMessage = require('../utils').formatDeltaMessage;
+var getType = require('@dino-vn/fca-unofficial/utils').getType;
+var formatDeltaMessage = require('@dino-vn/fca-unofficial/utils').formatDeltaMessage;
 var shareAttachmentFixture = require('./data/shareAttach');
 
 var userID = conf.user.id;
