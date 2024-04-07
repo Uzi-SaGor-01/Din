@@ -50,7 +50,7 @@ module.exports = function (defaultFuncs, api, ctx) {
           .post(
             "https://www.facebook.com/ajax/messaging/typ.php",
             ctx.jar,
-            form
+            form,
           )
           .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
           .then(function (resData) {
@@ -82,7 +82,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       if (callback) {
         log.warn(
           "sendTypingIndicator",
-          "callback is not a function - ignoring."
+          "callback is not a function - ignoring.",
         );
       }
       callback = () => {};
@@ -98,7 +98,7 @@ module.exports = function (defaultFuncs, api, ctx) {
         if (cb) {
           log.warn(
             "sendTypingIndicator",
-            "callback is not a function - ignoring."
+            "callback is not a function - ignoring.",
           );
         }
         cb = () => {};
@@ -163,15 +163,17 @@ module.exports = function (defaultFuncs, api, ctx) {
       if (typeof callback !== "function") delay = callback;
       try {
         sendTypingIndicatorMqtt(true, threadID, callback);
-        setTimeout(function () {
-          sendTypingIndicatorMqtt(false, threadID, () => {});
-        }, delay ? delay : 30 * 1000);
+        setTimeout(
+          function () {
+            sendTypingIndicatorMqtt(false, threadID, () => {});
+          },
+          delay ? delay : 30 * 1000,
+        );
         callback();
       } catch (e) {
         // console.error(e);
         sendTypingIndicatorNoMqtt(threadID, callback, isGroup);
       }
-    }
-    else sendTypingIndicatorNoMqtt(threadID, callback, isGroup);
+    } else sendTypingIndicatorNoMqtt(threadID, callback, isGroup);
   };
 };

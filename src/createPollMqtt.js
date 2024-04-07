@@ -1,6 +1,9 @@
 "use strict";
 
-const { generateOfflineThreadingID, getCurrentTimestamp } = require("@dino-vn/fca-unofficial/utils");
+const {
+  generateOfflineThreadingID,
+  getCurrentTimestamp,
+} = require("@dino-vn/fca-unofficial/utils");
 
 function isCallable(func) {
   try {

@@ -16,7 +16,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             _0x32f946 == "x" ? _0x141041 : (_0x141041 & 0x3) | 0x8
           ).toString(16);
           return _0x31fcdd;
-        }
+        },
       );
     return _0x4ec135;
   }
@@ -50,7 +50,7 @@ module.exports = function (defaultFuncs, api, ctx) {
           "https://www.facebook.com/ajax/ufi/upload",
           ctx.jar,
           form,
-          {}
+          {},
         )
         .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
         .then(function (resData) {
@@ -61,7 +61,7 @@ module.exports = function (defaultFuncs, api, ctx) {
           // We have to return the data unformatted unless we want to change it
           // back in sendMessage.
           return resData.payload;
-        })
+        }),
     );
 
     // resolve all promises
@@ -120,7 +120,7 @@ module.exports = function (defaultFuncs, api, ctx) {
     };
 
     const res = JSON.parse(
-      await api.httpPost("https://www.facebook.com/api/graphql/", form)
+      await api.httpPost("https://www.facebook.com/api/graphql/", form),
     );
     return res;
   }
@@ -138,11 +138,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             return callback(err);
           }
 
-          await sendCommentToFb(
-            postId,
-            text,
-            files[0].fbid
-          )
+          await sendCommentToFb(postId, text, files[0].fbid)
             .then((res) => {
               return callback(null, res);
             })
