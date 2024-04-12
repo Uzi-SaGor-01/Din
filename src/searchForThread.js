@@ -1,6 +1,6 @@
 "use strict";
 
-var utils = require("dinovn-fca/utils");
+var utils = require("../utils");
 
 module.exports = function (defaultFuncs, api, ctx) {
   return function searchForThread(name, callback) {

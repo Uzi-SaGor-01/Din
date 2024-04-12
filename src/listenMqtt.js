@@ -1,6 +1,6 @@
 /* eslint-disable no-redeclare */
 "use strict";
-var utils = require("dinovn-fca/utils");
+var utils = require("../utils");
 var log = require("npmlog");
 var mqtt = require("mqtt");
 var websocket = require("websocket-stream");
@@ -26,6 +26,9 @@ var topics = [
   //Need to publish /messenger_sync_create_queue right after this
   "/orca_presence",
   //Will receive /sr_res right here.
+
+  "/ls_resp",
+  // "/ls_req",
 
   "/inbox",
   "/mercury",
@@ -237,6 +240,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         const { type: taskType, callback: taskCallback } = taskData;
         const taskRespData = getTaskResponseData(taskType, parsedPayload);
 
+        console.log("ls_resp", taskType, taskRespData);
         if (taskRespData == null) {
           taskCallback("error", null);
         } else {

@@ -1,10 +1,11 @@
 "use strict";
 
-var utils = require("dinovn-fca/utils");
+var utils = require("../utils");
 var log = require("npmlog");
+const { generateOfflineThreadingID } = require("../utils");
 
 module.exports = function (defaultFuncs, api, ctx) {
-  return function setMessageReaction(
+  function setMessageReactionNoMqtt(
     reaction,
     messageID,
     callback,
@@ -119,4 +120,87 @@ module.exports = function (defaultFuncs, api, ctx) {
 
     return returnPromise;
   };
+  function setMessageReactionMqtt(
+    reaction,
+    messageID,
+    threadID,
+    callback,
+  ) {
+    if (!ctx.mqttClient) {
+      throw new Error("Not connected to MQTT");
+    }
+
+    ctx.wsReqNumber += 1;
+    let taskNumber = ++ctx.wsTaskNumber;
+
+    const taskPayload = {
+      thread_key: threadID,
+      timestamp_ms: getCurrentTimestamp(),
+      message_id: messageID,
+      reaction: reaction,
+      actor_id: ctx.userID,
+      reaction_style: null,
+      sync_group: 1,
+      send_attribution: Math.random() < 0.5 ? 65537 : 524289,
+    };
+
+    const task = {
+      failure_count: null,
+      label: "29",
+      payload: JSON.stringify(taskPayload),
+      queue_name: JSON.stringify(["reaction", messageID]),
+      task_id: taskNumber,
+    };
+
+    const content = {
+      app_id: "2220391788200892",
+      payload: JSON.stringify({
+        data_trace_id: null,
+        epoch_id: parseInt(generateOfflineThreadingID()),
+        tasks: [task],
+        version_id: "7158486590867448",
+      }),
+      request_id: ctx.wsReqNumber,
+      type: 3,
+    };
+
+    if (typeof callback === "function") {
+      ctx["tasks"].set(taskNumber, {
+        type: "set_message_reaction",
+        callback: callback,
+      });
+    }
+    ctx.mqttClient.publish("/ls_req", JSON.stringify(content), {
+      qos: 1,
+      retain: false,
+    });
+  };
+
+  return function setMessageReaction(
+    reaction,
+    messageID,
+    threadID,
+    callback,
+  ) {
+    if (ctx.mqttClient) {
+      try {
+        setMessageReactionMqtt(reaction, messageID, threadID, callback);
+        callback();
+      } catch (e) {
+        setMessageReactionNoMqtt(
+          reaction,
+          messageID,
+          callback,
+          true,
+        );
+      }
+    } else {
+      setMessageReactionNoMqtt(
+        reaction,
+        messageID,
+        callback,
+        true,
+      );
+    }
+  }
 };

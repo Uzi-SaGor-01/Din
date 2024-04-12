@@ -1,6 +1,6 @@
 "use strict";
 
-var utils = require("dinovn-fca/utils");
+var utils = require("../utils");
 var log = require("npmlog");
 
 function formatEventReminders(reminder) {

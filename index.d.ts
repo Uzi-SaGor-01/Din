@@ -88,7 +88,6 @@ declare module 'dinovn-fca' {
         changeThreadEmoji: (emoji: string | null, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         createNewGroup: (participantIDs: string[], groupTitle?: string, callback?: (err: Error, threadID: string) => void) => Promise<string>,
         createPoll: (title: string, threadID: string, options?: { [item: string]: boolean }, callback?: (err?: Error) => void) => Promise<void>,
-        createPollMqtt: (title: string, options?: { [item: string]: boolean }, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         deleteMessage: (messageOrMessages: string | string[], callback?: (err?: Error) => void) => Promise<void>,
         deleteThread: (threadOrThreads: string | string[], callback?: (err?: Error) => void) => Promise<void>,
         editMessage: (text: string, messageID: string, callback?: (err?: Error) => void) => Promise<void>,
@@ -125,13 +124,11 @@ declare module 'dinovn-fca' {
             attachment?: ReadableStream,
         }, postID: string, callback?: (err?: Error) => void) => Promise<void>,
         sendTypingIndicator: (threadID: string, callback?: (err?: Error) => void | number, delay?: number) => Promise<void>,
-        setMessageReaction: (reaction: string, messageID: string, callback?: (err?: Error) => void, forceCustomReaction?: boolean) => Promise<void>,
         setMessageReactionMqtt: (reaction: string, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setOptions: (options: Partial<IFCAU_Options>) => void,
         setTitle: (newTitle: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setTheme: (themeID?: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
-        unsendMessage: (messageID: string, callback?: (err?: Error) => void) => Promise<void>,
-        unsendMessageMqtt: (messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        unsendMessage: (messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
     }
 
     export type IFCAU_ListenMessage =

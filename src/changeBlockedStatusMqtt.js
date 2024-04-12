@@ -4,7 +4,7 @@ const {
   generateOfflineThreadingID,
   getCurrentTimestamp,
   getGUID,
-} = require("dinovn-fca/utils");
+} = require("../utils");
 
 function isCallable(func) {
   try {

@@ -114,6 +114,8 @@ function buildAPI(globalOptions, html, jar) {
     .toString();
   log.info("login", `Logged in as ${userID}`);
 
+  
+
   try {
     clearInterval(checkVerified);
   } catch (_) {}
@@ -208,7 +210,6 @@ function buildAPI(globalOptions, html, jar) {
     "changeThreadEmoji",
     "createNewGroup",
     "createPoll",
-    "createPollMqtt",
     "deleteMessage",
     "deleteThread",
     "editMessage",
@@ -239,12 +240,10 @@ function buildAPI(globalOptions, html, jar) {
     "sendComment",
     "sendTypingIndicator",
     "setMessageReaction",
-    "setMessageReactionMqtt",
     "setTitle",
     "setTheme",
     "threadColors",
     "unsendMessage",
-    "unsendMessageMqtt",
     "unfriend",
 
     // HTTP

@@ -1,10 +1,11 @@
 "use strict";
 
-var utils = require("dinovn-fca/utils");
+var utils = require("../utils");
 var log = require("npmlog");
+const { generateOfflineThreadingID } = require("../utils");
 
 module.exports = function (defaultFuncs, api, ctx) {
-  return function unsendMessage(messageID, callback) {
+  function unsendMessageNoMqtt(messageID, callback) {
     var resolveFunc = function () {};
     var rejectFunc = function () {};
     var returnPromise = new Promise(function (resolve, reject) {
@@ -42,4 +43,64 @@ module.exports = function (defaultFuncs, api, ctx) {
 
     return returnPromise;
   };
+
+  function unsendMessageMqtt(messageID, threadID, callback) {
+    if (!ctx.mqttClient) {
+      throw new Error("Not connected to MQTT");
+    }
+
+    ctx.wsReqNumber += 1;
+    ctx.wsTaskNumber += 1;
+
+    const label = "33";
+
+    const taskPayload = {
+      message_id: messageID,
+      thread_key: threadID,
+      sync_group: 1,
+    };
+
+    const payload = JSON.stringify(taskPayload);
+    const version = "25393437286970779";
+
+    const task = {
+      failure_count: null,
+      label: label,
+      payload: payload,
+      queue_name: "unsend_message",
+      task_id: ctx.wsTaskNumber,
+    };
+
+    const content = {
+      app_id: "2220391788200892",
+      payload: JSON.stringify({
+        tasks: [task],
+        epoch_id: parseInt(generateOfflineThreadingID()),
+        version_id: version,
+      }),
+      request_id: ctx.wsReqNumber,
+      type: 3,
+    };
+
+    // if (isCallable(callback)) {
+    //   // to be implemented
+    // }
+
+    ctx.mqttClient.publish("/ls_req", JSON.stringify(content), {
+      qos: 1,
+      retain: false,
+    });
+  };
+
+  return function unsendMessage(messageID, threadID, callback) {
+    if (ctx.mqttClient) {
+      try {
+        unsendMessageMqtt(messageID, threadID, callback);
+        callback();
+      } catch (e) {
+        // console.error(e);
+        unsendMessageNoMqtt(threadID, callback, isGroup);
+      }
+    } else unsendMessageNoMqtt(threadID, callback, isGroup);
+  } 
 };
