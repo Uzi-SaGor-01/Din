@@ -58,7 +58,7 @@ function formatThreadGraphQLResponse(data) {
     threadID: threadID,
     threadName: messageThread.name,
     participantIDs: messageThread.all_participants.edges.map(
-      (d) => d.node.messaging_actor.id,
+      (d) => d.node.messaging_actor.id
     ),
     userInfo: messageThread.all_participants.edges.map((d) => ({
       id: d.node.messaging_actor.id,
@@ -100,7 +100,7 @@ function formatThreadGraphQLResponse(data) {
               if (val.nickname) res[val.participant_id] = val.nickname;
               return res;
             },
-            {},
+            {}
           )
         : {},
     adminIDs: messageThread.thread_admins.map((el) => el.id),
@@ -141,7 +141,7 @@ function formatThreadGraphQLResponse(data) {
 }
 
 module.exports = function (defaultFuncs, api, ctx) {
-  return function getThreadInfoGraphQL(threadID, callback) {
+  return function getThreadInfoGraphQL(threadID, callback, no_cache) {
     var resolveFunc = function () {};
     var rejectFunc = function () {};
     var returnPromise = new Promise(function (resolve, reject) {
@@ -149,6 +149,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       rejectFunc = reject;
     });
 
+    if (!no_cache && typeof callback == "boolean") no_cache = callback;
     if (
       utils.getType(callback) != "Function" &&
       utils.getType(callback) != "AsyncFunction"
@@ -161,46 +162,58 @@ module.exports = function (defaultFuncs, api, ctx) {
       };
     }
 
-    // `queries` has to be a string. I couldn't tell from the dev console. This
-    // took me a really long time to figure out. I deserve a cookie for this.
-    var form = {
-      queries: JSON.stringify({
-        o0: {
-          // This doc_id is valid as of July 20th, 2020
-          doc_id: "3449967031715030",
-          query_params: {
-            id: threadID,
-            message_limit: 0,
-            load_messages: false,
-            load_read_receipts: false,
-            before: null,
+    const cache = utils.groupsCache.findOneById(threadID);
+
+    if (!no_cache && cache) {
+      callback(null, cache);
+      return returnPromise;
+    } else {
+      // `queries` has to be a string. I couldn't tell from the dev console. This
+      // took me a really long time to figure out. I deserve a cookie for this.
+      var form = {
+        queries: JSON.stringify({
+          o0: {
+            // This doc_id is valid as of July 20th, 2020
+            doc_id: "3449967031715030",
+            query_params: {
+              id: threadID,
+              message_limit: 0,
+              load_messages: false,
+              load_read_receipts: false,
+              before: null,
+            },
           },
-        },
-      }),
-      batch_name: "MessengerGraphQLThreadFetcher",
-    };
+        }),
+        batch_name: "MessengerGraphQLThreadFetcher",
+      };
 
-    defaultFuncs
-      .post("https://www.facebook.com/api/graphqlbatch/", ctx.jar, form)
-      .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
-      .then(function (resData) {
-        if (resData.error) {
-          throw resData;
-        }
-        // This returns us an array of things. The last one is the success /
-        // failure one.
-        // @TODO What do we do in this case?
-        if (resData[resData.length - 1].error_results !== 0) {
-          throw new Error("well darn there was an error_result");
-        }
+      defaultFuncs
+        .post("https://www.facebook.com/api/graphqlbatch/", ctx.jar, form)
+        .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
+        .then(function (resData) {
+          if (resData.error) {
+            throw resData;
+          }
+          // This returns us an array of things. The last one is the success /
+          // failure one.
+          // @TODO What do we do in this case?
+          if (resData[resData.length - 1].error_results !== 0) {
+            throw new Error("well darn there was an error_result");
+          }
 
-        callback(null, formatThreadGraphQLResponse(resData[0]));
-      })
-      .catch(function (err) {
-        log.error("getThreadInfoGraphQL", err);
-        return callback(err);
-      });
+          let data = formatThreadGraphQLResponse(resData[0])
+          data._id = threadID
 
-    return returnPromise;
+          utils.groupsCache.addOne(data)
+          setInterval(() => utils.groupsCache.deleteOneUsingId(threadID), ctx.globalOptions.cacheTime)
+          callback(null, data);
+        })
+        .catch(function (err) {
+          log.error("getThreadInfoGraphQL", err);
+          return callback(err);
+        });
+
+      return returnPromise;
+    }
   };
 };

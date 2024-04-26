@@ -3,7 +3,6 @@
 var utils = require("./utils");
 var cheerio = require("cheerio");
 var log = require("npmlog");
-var fs = require("fs");
 
 var checkVerified = null;
 
@@ -11,7 +10,7 @@ var defaultLogRecordSize = 100;
 log.maxRecordSize = defaultLogRecordSize;
 
 function setOptions(globalOptions, options) {
-  Object.keys(options).map(function(key) {
+  Object.keys(options).map(function (key) {
     switch (key) {
       case "pauseLog":
         if (options.pauseLog) log.pause();
@@ -82,6 +81,9 @@ function setOptions(globalOptions, options) {
 function buildAPI(globalOptions, html, jar) {
   var maybeCookie = jar.getCookies("https://www.facebook.com");
 
+  utils.usersCache.resetModel();
+  utils.groupsCache.resetModel();
+
   if (
     maybeCookie.some((val) => val.cookieString().split("=")[0] === "i_user")
   ) {
@@ -108,13 +110,8 @@ function buildAPI(globalOptions, html, jar) {
     );
   }
 
-  var userID = maybeCookie[0]
-    .cookieString()
-    .split("=")[1]
-    .toString();
+  var userID = maybeCookie[0].cookieString().split("=")[1].toString();
   log.info("login", `Logged in as ${userID}`);
-
-  
 
   try {
     clearInterval(checkVerified);
@@ -237,7 +234,6 @@ function buildAPI(globalOptions, html, jar) {
     "resolvePhotoUrl",
     "searchForThread",
     "sendMessage",
-    "sendComment",
     "sendTypingIndicator",
     "setMessageReaction",
     "setTitle",
@@ -254,7 +250,7 @@ function buildAPI(globalOptions, html, jar) {
   var defaultFuncs = utils.makeDefaults(html, userID, ctx);
 
   // Load all api functions in a loop
-  apiFuncNames.map(function(v) {
+  apiFuncNames.map(function (v) {
     api[v] = require("./src/" + v)(defaultFuncs, api, ctx);
   });
 
@@ -266,32 +262,32 @@ function buildAPI(globalOptions, html, jar) {
 }
 
 function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
-  return function(res) {
+  return function (res) {
     var html = res.body;
     var $ = cheerio.load(html);
     var arr = [];
 
     // This will be empty, but just to be sure we leave it
-    $("#login_form input").map(function(i, v) {
+    $("#login_form input").map(function (i, v) {
       arr.push({ val: $(v).val(), name: $(v).attr("name") });
     });
 
-    arr = arr.filter(function(v) {
+    arr = arr.filter(function (v) {
       return v.val && v.val.length;
     });
 
     var form = utils.arrToForm(arr);
-    // form.lsd = utils.getFrom(html, '["LSD",[],{"token":"', '"}');
-    // form.lgndim = Buffer.from(
-    //     '{"w":1440,"h":900,"aw":1440,"ah":834,"c":24}'
-    // ).toString("base64");
+    form.lsd = utils.getFrom(html, '["LSD",[],{"token":"', '"}');
+    form.lgndim = Buffer.from(
+      '{"w":1440,"h":900,"aw":1440,"ah":834,"c":24}'
+    ).toString("base64");
     form.email = email;
     form.pass = password;
-    // form.default_persistent = "0";
-    // form.lgnrnd = utils.getFrom(html, 'name="lgnrnd" value="', '"');
-    // form.locale = "en_US";
-    // form.timezone = "240";
-    // form.lgnjs = ~~(Date.now() / 1000);
+    form.default_persistent = "0";
+    form.lgnrnd = utils.getFrom(html, 'name="lgnrnd" value="', '"');
+    form.locale = "en_US";
+    form.timezone = "240";
+    form.lgnjs = ~~(Date.now() / 1000);
 
     // Getting cookies from the HTML page... (kill me now plz)
     // we used to get a bunch of cookies in the headers of the response of the
@@ -303,7 +299,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
     //
     // ---------- Very Hacky Part Starts -----------------
     var willBeCookies = html.split('"_js_');
-    willBeCookies.slice(1).map(function(val) {
+    willBeCookies.slice(1).map(function (val) {
       var cookieData = JSON.parse('["' + utils.getFrom(val, "", "]") + "]");
       jar.setCookie(
         utils.formatCookie(cookieData, "facebook"),
@@ -315,44 +311,42 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
     log.info("login", "Logging in...");
     return utils
       .post(
-        "https://mbasic.facebook.com/login/device-based/regular/login/?refsrc=deprecated&lwv=100&ref=dbl&refsrc=deprecated&lwv=100&ref=dbl",
+        "https://mbasic.facebook.com/login/device-based/regular/login/?login_attempt=1&lwv=110",
         jar,
         form,
         loginOptions
       )
       .then(utils.saveCookies(jar))
-      .then(function(res) {
+      .then(function (res) {
         var headers = res.headers;
-        // console.log(headers.location);
         if (!headers.location) {
           throw { error: "Wrong username/password." };
         }
 
         // This means the account has login approvals turned on.
         if (
-          headers.location.indexOf("https://mbasic.facebook.com/checkpoint/") >
-          -1
+          headers.location.indexOf("https://mbasic.facebook.com/checkpoint/") > -1
         ) {
           log.info("login", "You have login approvals turned on.");
           var nextURL =
-            "https://mbasic.facebook.com/checkpoint/?next=https%3A%2F%2Fwww.facebook.com%2Fhome.php";
+            "https://mbasic.facebook.com/checkpoint/?next=https%3A%2F%2Fmbasic.facebook.com%2Fhome.php";
 
           return utils
             .get(headers.location, jar, null, loginOptions)
             .then(utils.saveCookies(jar))
-            .then(function(res) {
+            .then(function (res) {
               var html = res.body;
               // Make the form in advance which will contain the fb_dtsg and nh
               var $ = cheerio.load(html);
               var arr = [];
-              $("form input").map(function(i, v) {
+              $("form input").map(function (i, v) {
                 arr.push({
                   val: $(v).val(),
                   name: $(v).attr("name"),
                 });
               });
 
-              arr = arr.filter(function(v) {
+              arr = arr.filter(function (v) {
                 return v.val && v.val.length;
               });
 
@@ -396,7 +390,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                     ).html(); //'Continue';
                     var prResolve = null;
                     var prReject = null;
-                    var rtPromise = new Promise(function(resolve, reject) {
+                    var rtPromise = new Promise(function (resolve, reject) {
                       prResolve = resolve;
                       prReject = reject;
                     });
@@ -404,7 +398,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                       utils
                         .post(nextURL, jar, form, loginOptions)
                         .then(utils.saveCookies(jar))
-                        .then(function(res) {
+                        .then(function (res) {
                           var $ = cheerio.load(res.body);
                           var error = $("#approvals_code")
                             .parent()
@@ -418,7 +412,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                             };
                           }
                         })
-                        .then(function() {
+                        .then(function () {
                           // Use the same form (safe I hope)
                           delete form.no_fido;
                           delete form.approvals_code;
@@ -428,7 +422,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                             .post(nextURL, jar, form, loginOptions)
                             .then(utils.saveCookies(jar));
                         })
-                        .then(function(res) {
+                        .then(function (res) {
                           var headers = res.headers;
                           if (
                             !headers.location &&
@@ -443,7 +437,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                           var appState = utils.getAppState(jar);
 
                           if (callback === prCallback) {
-                            callback = function(err, api) {
+                            callback = function (err, api) {
                               if (err) {
                                 return prReject(err);
                               }
@@ -461,7 +455,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                             callback
                           );
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                           // Check if using Promise instead of callback
                           if (callback === prCallback) {
                             prReject(err);
@@ -472,7 +466,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                     } else {
                       utils
                         .post(
-                          "https://mbasic.facebook.com/checkpoint/?next=https%3A%2F%2Fwww.facebook.com%2Fhome.php",
+                          "https://mbasic.facebook.com/checkpoint/?next=https%3A%2F%2Fmbasic.facebook.com%2Fhome.php",
                           jar,
                           form,
                           loginOptions,
@@ -498,7 +492,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                               "Verified from browser. Logging in..."
                             );
                             if (callback === prCallback) {
-                              callback = function(err, api) {
+                              callback = function (err, api) {
                                 if (err) {
                                   return prReject(err);
                                 }
@@ -542,7 +536,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                 return utils
                   .post(nextURL, jar, form, loginOptions)
                   .then(utils.saveCookies(jar))
-                  .then(function() {
+                  .then(function () {
                     // Use the same form (safe I hope)
                     form.name_action_selected = "save_device";
 
@@ -550,7 +544,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                       .post(nextURL, jar, form, loginOptions)
                       .then(utils.saveCookies(jar));
                   })
-                  .then(function(res) {
+                  .then(function (res) {
                     var headers = res.headers;
 
                     if (
@@ -574,7 +568,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
                       callback
                     );
                   })
-                  .catch(function(e) {
+                  .catch(function (e) {
                     callback(e);
                   });
               }
@@ -582,7 +576,7 @@ function makeLogin(jar, email, password, loginOptions, callback, prCallback) {
         }
 
         return utils
-          .get("https://www.facebook.com/", jar, null, loginOptions)
+          .get("https://mbasic.facebook.com/", jar, null, loginOptions)
           .then(utils.saveCookies(jar));
       });
   };
@@ -603,7 +597,7 @@ function loginHelper(
   // If we're given an appState we loop through it and save each cookie
   // back into the jar.
   if (appState) {
-    appState.map(function(c) {
+    appState.map(function (c) {
       var str =
         c.key +
         "=" +
@@ -628,20 +622,14 @@ function loginHelper(
     // Open the main page, then we login with the given credentials and finally
     // load the main page again (it'll give us some IDs that we need)
     mainPromise = utils
-      .get(
-        "https://mbasic.facebook.com/login/?ref=dbl&fl&login_from_aymh=1",
-        null,
-        null,
-        globalOptions,
-        {
-          noRef: true,
-        }
-      )
+      .get("https://www.facebook.com/", null, null, globalOptions, {
+        noRef: true,
+      })
       .then(utils.saveCookies(jar))
       .then(
         makeLogin(jar, email, password, globalOptions, callback, prCallback)
       )
-      .then(function() {
+      .then(function () {
         return utils
           .get("https://www.facebook.com/", jar, null, globalOptions)
           .then(utils.saveCookies(jar));
@@ -653,7 +641,7 @@ function loginHelper(
   var api = null;
 
   mainPromise = mainPromise
-    .then(function(res) {
+    .then(function (res) {
       // Hacky check for the redirection that happens on some ISPs, which doesn't return statusCode 3xx
       var reg = /<meta http-equiv="refresh" content="0;url=([^"]+)[^>]+>/;
       var redirect = reg.exec(res.body);
@@ -664,58 +652,57 @@ function loginHelper(
       }
       return res;
     })
-    .then(function(res) {
+    .then(function (res) {
       var html = res.body;
       var stuff = buildAPI(globalOptions, html, jar);
       ctx = stuff[0];
       _defaultFuncs = stuff[1];
       api = stuff[2];
       return res;
+    });
+
+  // given a pageID we log in as a page
+  if (globalOptions.pageID) {
+    mainPromise = mainPromise
+      .then(function () {
+        return utils.get(
+          "https://www.facebook.com/" +
+            ctx.globalOptions.pageID +
+            "/messages/?section=messages&subsection=inbox",
+          ctx.jar,
+          null,
+          globalOptions
+        );
+      })
+      .then(function (resData) {
+        var url = utils
+          .getFrom(
+            resData.body,
+            'window.location.replace("https:\\/\\/www.facebook.com\\',
+            '");'
+          )
+          .split("\\")
+          .join("");
+        url = url.substring(0, url.length - 1);
+
+        return utils.get(
+          "https://www.facebook.com" + url,
+          ctx.jar,
+          null,
+          globalOptions
+        );
+      });
+  }
+
+  // At the end we call the callback or catch an exception
+  mainPromise
+    .then(function () {
+      log.info("login", "Done logging in.");
+      return callback(null, api);
     })
-    .then(function(res) {
-      // given a pageID we log in as a page
-      if (globalOptions.pageID) {
-        mainPromise = mainPromise
-          .then(function() {
-            return utils.get(
-              "https://www.facebook.com/" +
-                ctx.globalOptions.pageID +
-                "/messages/?section=messages&subsection=inbox",
-              ctx.jar,
-              null,
-              globalOptions
-            );
-          })
-          .then(function(resData) {
-            var url = utils
-              .getFrom(
-                resData.body,
-                'window.location.replace("https:\\/\\/www.facebook.com\\',
-                '");'
-              )
-              .split("\\")
-              .join("");
-            url = url.substring(0, url.length - 1);
-
-            return utils.get(
-              "https://www.facebook.com" + url,
-              ctx.jar,
-              null,
-              globalOptions
-            );
-          });
-      }
-
-      // At the end we call the callback or catch an exception
-      mainPromise
-        .then(function() {
-          log.info("login", "Done logging in.");
-          return callback(null, api);
-        })
-        .catch(function(e) {
-          log.error("login", e.error || e);
-          callback(e);
-        });
+    .catch(function (e) {
+      log.error("login", e.error || e);
+      callback(e);
     });
 }
 
@@ -740,6 +727,7 @@ function login(loginData, options, callback) {
     logRecordSize: defaultLogRecordSize,
     online: true,
     emitReady: false,
+    cacheTime: 5 * 60 * 1000,
     userAgent:
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/600.3.18 (KHTML, like Gecko) Version/8.0.3 Safari/600.3.18",
   };
@@ -753,11 +741,11 @@ function login(loginData, options, callback) {
   ) {
     var rejectFunc = null;
     var resolveFunc = null;
-    var returnPromise = new Promise(function(resolve, reject) {
+    var returnPromise = new Promise(function (resolve, reject) {
       resolveFunc = resolve;
       rejectFunc = reject;
     });
-    prCallback = function(error, api) {
+    prCallback = function (error, api) {
       if (error) {
         return rejectFunc(error);
       }

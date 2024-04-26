@@ -7,6 +7,11 @@ var stream = require("stream");
 var log = require("npmlog");
 var querystring = require("querystring");
 var url = require("url");
+const { Container } = require("nosql-json-database");
+
+const database = new Container();
+const usersCache = database.createCollection("users")
+const groupsCache = database.createCollection("groups")
 
 function setProxy(url) {
   if (typeof url == undefined)
@@ -1387,7 +1392,11 @@ function getAppState(jar) {
     .concat(jar.getCookies("https://facebook.com"))
     .concat(jar.getCookies("https://www.messenger.com"));
 }
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 module.exports = {
+  delay,
   isReadableStream,
   get,
   post,
@@ -1427,4 +1436,8 @@ module.exports = {
   getAdminTextMessageType,
   setProxy,
   getCurrentTimestamp,
+  // Database / cache
+  database,
+  usersCache,
+  groupsCache,
 };

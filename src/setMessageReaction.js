@@ -119,13 +119,8 @@ module.exports = function (defaultFuncs, api, ctx) {
       });
 
     return returnPromise;
-  };
-  function setMessageReactionMqtt(
-    reaction,
-    messageID,
-    threadID,
-    callback,
-  ) {
+  }
+  function setMessageReactionMqtt(reaction, messageID, threadID, callback) {
     if (!ctx.mqttClient) {
       throw new Error("Not connected to MQTT");
     }
@@ -174,33 +169,18 @@ module.exports = function (defaultFuncs, api, ctx) {
       qos: 1,
       retain: false,
     });
-  };
+  }
 
-  return function setMessageReaction(
-    reaction,
-    messageID,
-    threadID,
-    callback,
-  ) {
+  return function setMessageReaction(reaction, messageID, threadID, callback) {
     if (ctx.mqttClient) {
       try {
         setMessageReactionMqtt(reaction, messageID, threadID, callback);
         callback();
       } catch (e) {
-        setMessageReactionNoMqtt(
-          reaction,
-          messageID,
-          callback,
-          true,
-        );
+        setMessageReactionNoMqtt(reaction, messageID, callback, true);
       }
     } else {
-      setMessageReactionNoMqtt(
-        reaction,
-        messageID,
-        callback,
-        true,
-      );
+      setMessageReactionNoMqtt(reaction, messageID, callback, true);
     }
-  }
+  };
 };

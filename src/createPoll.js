@@ -68,7 +68,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       });
 
     return returnPromise;
-  };
+  }
 
   function createPollMqtt(title, options, threadID, callback) {
     if (!ctx.mqttClient) {
@@ -113,7 +113,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       qos: 1,
       retain: false,
     });
-  };
+  }
 
   return function createPoll(title, threadID, options, callback) {
     if (ctx.mqttClient) {
@@ -126,5 +126,5 @@ module.exports = function (defaultFuncs, api, ctx) {
     } else {
       return createPollNoMqtt(title, threadID, options, callback);
     }
-  }
+  };
 };

@@ -8,3 +8,4 @@ test/test-config.json
 test/test-appstate.json
 .npmrc
 appstate.json
+database

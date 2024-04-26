@@ -1,9 +1,6 @@
 "use strict";
 
-const {
-  generateOfflineThreadingID,
-  getCurrentTimestamp,
-} = require("../utils");
+const { generateOfflineThreadingID, getCurrentTimestamp } = require("../utils");
 
 function isCallable(func) {
   try {

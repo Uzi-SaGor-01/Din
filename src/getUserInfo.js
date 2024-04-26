@@ -10,7 +10,8 @@ function formatData(data) {
     // eslint-disable-next-line no-prototype-builtins
     if (data.hasOwnProperty(prop)) {
       var innerObj = data[prop];
-      retObj[prop] = {
+      let udata = {
+        _id: prop,
         name: innerObj.name,
         firstName: innerObj.firstName,
         vanity: innerObj.vanity,
@@ -21,6 +22,9 @@ function formatData(data) {
         isFriend: innerObj.is_friend,
         isBirthday: !!innerObj.is_birthday,
       };
+      utils.usersCache.addOne(udata);
+      setInterval(() => utils.usersCache.deleteOneUsingId(threadID), ctx.globalOptions.cacheTime)
+      retObj[prop] = udata;
     }
   }
 
@@ -28,7 +32,11 @@ function formatData(data) {
 }
 
 module.exports = function (defaultFuncs, api, ctx) {
-  return function getUserInfo(id, callback) {
+  return function getUserInfo(id, callback, no_cache) {
+    if (utils.getType(id) !== "Array") {
+      id = [id];
+    }
+
     var resolveFunc = function () {};
     var rejectFunc = function () {};
     var returnPromise = new Promise(function (resolve, reject) {
@@ -36,7 +44,8 @@ module.exports = function (defaultFuncs, api, ctx) {
       rejectFunc = reject;
     });
 
-    if (!callback) {
+    if (!no_cache && typeof callback == "boolean") no_cache = callback;
+    if (!callback || (callback && typeof callback != "function")) {
       callback = function (err, friendList) {
         if (err) {
           return rejectFunc(err);
@@ -45,28 +54,72 @@ module.exports = function (defaultFuncs, api, ctx) {
       };
     }
 
-    if (utils.getType(id) !== "Array") {
-      id = [id];
-    }
+    if (!no_cache) {
+      let dataCache = [];
+      let noCache = [];
 
-    var form = {};
-    id.map(function (v, i) {
-      form["ids[" + i + "]"] = v;
-    });
-    defaultFuncs
-      .post("https://www.facebook.com/chat/user_info/", ctx.jar, form)
-      .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
-      .then(function (resData) {
-        if (resData.error) {
-          throw resData;
+      for (let uid of id) {
+        const cache = utils.usersCache.findOneById(uid);
+        if (!cache) {
+          noCache.push(uid);
+          continue;
         }
-        return callback(null, formatData(resData.payload.profiles));
-      })
-      .catch(function (err) {
-        log.error("getUserInfo", err);
-        return callback(err);
-      });
+        dataCache.push(cache);
+      }
 
-    return returnPromise;
+      if (noCache.length != 0) {
+        var form = {};
+        noCache.map(function (v, i) {
+          form["ids[" + i + "]"] = v;
+        });
+        defaultFuncs
+          .post("https://www.facebook.com/chat/user_info/", ctx.jar, form)
+          .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
+          .then(function (resData) {
+            if (resData.error) {
+              throw resData;
+            }
+            let data = formatData(resData.payload.profiles);
+            for (let cdata of dataCache) {
+              data[cdata._id] = cdata;
+            }
+            return callback(null, data);
+          })
+          .catch(function (err) {
+            log.error("getUserInfo", err);
+            return callback(err);
+          });
+
+        return returnPromise;
+      } else {
+        let data = {};
+        for (let cdata of dataCache) {
+          data[cdata._id] = cdata;
+        }
+        callback(null, data);
+        return returnPromise;
+      }
+    } else {
+      var form = {};
+      id.map(function (v, i) {
+        form["ids[" + i + "]"] = v;
+      });
+      console.log(form);
+      defaultFuncs
+        .post("https://www.facebook.com/chat/user_info/", ctx.jar, form)
+        .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
+        .then(function (resData) {
+          if (resData.error) {
+            throw resData;
+          }
+          return callback(null, formatData(resData.payload.profiles));
+        })
+        .catch(function (err) {
+          log.error("getUserInfo", err);
+          return callback(err);
+        });
+
+      return returnPromise;
+    }
   };
 };

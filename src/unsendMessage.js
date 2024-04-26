@@ -42,7 +42,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       });
 
     return returnPromise;
-  };
+  }
 
   function unsendMessageMqtt(messageID, threadID, callback) {
     if (!ctx.mqttClient) {
@@ -90,7 +90,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       qos: 1,
       retain: false,
     });
-  };
+  }
 
   return function unsendMessage(messageID, threadID, callback) {
     if (ctx.mqttClient) {
@@ -102,5 +102,5 @@ module.exports = function (defaultFuncs, api, ctx) {
         unsendMessageNoMqtt(threadID, callback, isGroup);
       }
     } else unsendMessageNoMqtt(threadID, callback, isGroup);
-  } 
+  };
 };
