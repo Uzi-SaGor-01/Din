@@ -206,7 +206,7 @@ module.exports = function (defaultFuncs, api, ctx) {
 
           utils.groupsCache.addOne(data);
           setInterval(
-            () => utils.groupsCache.deleteOneUsingId(threadID),
+            () => utils.groupsCache.deleteOneUsingId(`${threadID}`),
             ctx.globalOptions.cacheTime,
           );
           callback(null, data);

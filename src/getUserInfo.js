@@ -24,7 +24,7 @@ function formatData(ctx, data) {
       };
       utils.usersCache.addOne(udata);
       setInterval(
-        () => utils.usersCache.deleteOneUsingId(threadID),
+        () => utils.usersCache.deleteOneUsingId(`${prop}`),
         ctx.globalOptions.cacheTime,
       );
       retObj[prop] = udata;
