@@ -3,7 +3,7 @@
 var utils = require("../utils");
 var log = require("npmlog");
 
-function formatData(data) {
+function formatData(ctx, data) {
   var retObj = {};
 
   for (var prop in data) {
@@ -82,7 +82,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             if (resData.error) {
               throw resData;
             }
-            let data = formatData(resData.payload.profiles);
+            let data = formatData(ctx, resData.payload.profiles);
             for (let cdata of dataCache) {
               data[cdata._id] = cdata;
             }
