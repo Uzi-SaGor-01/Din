@@ -10,8 +10,8 @@ var url = require("url");
 const { Container } = require("nosql-json-database");
 
 const database = new Container();
-const usersCache = database.createCollection("users")
-const groupsCache = database.createCollection("groups")
+const usersCache = database.createCollection("users");
+const groupsCache = database.createCollection("groups");
 
 function setProxy(url) {
   if (typeof url == undefined)

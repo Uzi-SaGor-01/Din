@@ -58,7 +58,7 @@ function formatThreadGraphQLResponse(data) {
     threadID: threadID,
     threadName: messageThread.name,
     participantIDs: messageThread.all_participants.edges.map(
-      (d) => d.node.messaging_actor.id
+      (d) => d.node.messaging_actor.id,
     ),
     userInfo: messageThread.all_participants.edges.map((d) => ({
       id: d.node.messaging_actor.id,
@@ -100,7 +100,7 @@ function formatThreadGraphQLResponse(data) {
               if (val.nickname) res[val.participant_id] = val.nickname;
               return res;
             },
-            {}
+            {},
           )
         : {},
     adminIDs: messageThread.thread_admins.map((el) => el.id),
@@ -201,11 +201,14 @@ module.exports = function (defaultFuncs, api, ctx) {
             throw new Error("well darn there was an error_result");
           }
 
-          let data = formatThreadGraphQLResponse(resData[0])
-          data._id = threadID
+          let data = formatThreadGraphQLResponse(resData[0]);
+          data._id = threadID;
 
-          utils.groupsCache.addOne(data)
-          setInterval(() => utils.groupsCache.deleteOneUsingId(threadID), ctx.globalOptions.cacheTime)
+          utils.groupsCache.addOne(data);
+          setInterval(
+            () => utils.groupsCache.deleteOneUsingId(threadID),
+            ctx.globalOptions.cacheTime,
+          );
           callback(null, data);
         })
         .catch(function (err) {

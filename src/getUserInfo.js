@@ -23,7 +23,10 @@ function formatData(data) {
         isBirthday: !!innerObj.is_birthday,
       };
       utils.usersCache.addOne(udata);
-      setInterval(() => utils.usersCache.deleteOneUsingId(threadID), ctx.globalOptions.cacheTime)
+      setInterval(
+        () => utils.usersCache.deleteOneUsingId(threadID),
+        ctx.globalOptions.cacheTime,
+      );
       retObj[prop] = udata;
     }
   }
