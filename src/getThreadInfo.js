@@ -162,7 +162,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       };
     }
 
-    const cache = utils.groupsCache.findOneById(threadID);
+    const cache = utils.groupsCache.findOneById(`${threadID}`);
 
     if (!no_cache && cache) {
       callback(null, cache);

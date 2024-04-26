@@ -62,7 +62,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       let noCache = [];
 
       for (let uid of id) {
-        const cache = utils.usersCache.findOneById(uid);
+        const cache = utils.usersCache.findOneById(`${uid}`);
         if (!cache) {
           noCache.push(uid);
           continue;
