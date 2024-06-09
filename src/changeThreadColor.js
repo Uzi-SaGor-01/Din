@@ -25,12 +25,12 @@ module.exports = function (defaultFuncs, api, ctx) {
     var colorList = Object.keys(api.threadColors).map(function (name) {
       return api.threadColors[name];
     });
-    if (!colorList.includes(validatedColor)) {
-      throw {
-        error:
-          "The color you are trying to use is not a valid thread color. Use api.threadColors to find acceptable values.",
-      };
-    }
+    // if (!colorList.includes(validatedColor)) {
+    //   throw {
+    //     error:
+    //       "The color you are trying to use is not a valid thread color. Use api.threadColors to find acceptable values.",
+    //   };
+    // }
 
     var form = {
       dpr: 1,
