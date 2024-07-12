@@ -8,8 +8,12 @@ var log = require("npmlog");
 var querystring = require("querystring");
 var url = require("url");
 const { Container } = require("nosql-json-database");
+const path = require("path");
+const { existsSync, mkdirSync } = require("fs");
 
-const database = new Container();
+if (!existsSync(path.join(process.cwd(), "dinovn-fca")))
+  mkdirSync(path.join(process.cwd(), "dinovn-fca"));
+const database = new Container(path.join(process.cwd(), "dinovn-fca"));
 const usersCache = database.createCollection("users");
 const groupsCache = database.createCollection("groups");
 
