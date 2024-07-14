@@ -96,11 +96,9 @@ module.exports = function (defaultFuncs, api, ctx) {
     if (ctx.mqttClient) {
       try {
         unsendMessageMqtt(messageID, threadID, callback);
-        callback();
       } catch (e) {
-        // console.error(e);
-        unsendMessageNoMqtt(threadID, callback, isGroup);
+        unsendMessageNoMqtt(messageID, callback);
       }
-    } else unsendMessageNoMqtt(threadID, callback, isGroup);
+    } else unsendMessageNoMqtt(messageID, callback);
   };
 };

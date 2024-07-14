@@ -124,7 +124,7 @@ declare module 'dinovn-fca' {
             attachment?: ReadableStream,
         }, postID: string, callback?: (err?: Error) => void) => Promise<void>,
         sendTypingIndicator: (threadID: string, callback?: (err?: Error) => void | number, delay?: number) => Promise<void>,
-        setMessageReactionMqtt: (reaction: string, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        setMessageReaction: (reaction: string, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setOptions: (options: Partial<IFCAU_Options>) => void,
         setTitle: (newTitle: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setTheme: (themeID?: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
