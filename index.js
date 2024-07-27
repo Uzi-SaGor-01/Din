@@ -237,6 +237,8 @@ function buildAPI(globalOptions, html, jar) {
     "sendTypingIndicator",
     "setMessageReaction",
     "setTitle",
+    "shareContact",
+    "shareLink",
     "setTheme",
     "threadColors",
     "unsendMessage",

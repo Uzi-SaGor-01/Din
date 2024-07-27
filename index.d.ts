@@ -127,6 +127,8 @@ declare module 'dinovn-fca' {
         setMessageReaction: (reaction: string, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setOptions: (options: Partial<IFCAU_Options>) => void,
         setTitle: (newTitle: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        shareContact: (contactID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        shareLink: (text: string, link: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         setTheme: (themeID?: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         unsendMessage: (messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
     }
