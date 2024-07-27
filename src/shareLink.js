@@ -5,6 +5,10 @@ var log = require("npmlog");
 
 module.exports = function (defaultFuncs, api, ctx) {
   return async function shareLink(text, url, threadID, callback) {
+    if (!ctx.mqttClient) {
+      throw new Error("Not connected to MQTT");
+    }
+
     var resolveFunc = function () {};
     var rejectFunc = function () {};
     var returnPromise = new Promise(function (resolve, reject) {
@@ -18,7 +22,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       };
     }
     let count_req = 0;
-    mqttClient.publish(
+    ctx.mqttClient.publish(
       "/ls_req",
       JSON.stringify({
         app_id: "2220391788200892",

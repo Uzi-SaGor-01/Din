@@ -240,11 +240,9 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         const { type: taskType, callback: taskCallback } = taskData;
         const taskRespData = getTaskResponseData(taskType, parsedPayload);
 
-        console.log("ls_resp", taskType, taskRespData);
         if (taskRespData == null) {
           taskCallback("error", null);
         } else {
-          console.log("ls_resp", taskType, taskRespData);
           taskCallback(null, {
             type: taskType,
             reqID: reqID,
