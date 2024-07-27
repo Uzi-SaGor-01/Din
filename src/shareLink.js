@@ -51,7 +51,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       {
         qos: 1,
         retain: false,
-      }
+      },
     );
     return returnPromise;
   };
