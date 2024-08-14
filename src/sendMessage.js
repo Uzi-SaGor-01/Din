@@ -41,7 +41,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             "https://upload.facebook.com/ajax/mercury/upload.php",
             ctx.jar,
             form,
-            {},
+            {}
           )
           .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
           .then(function (resData) {
@@ -52,7 +52,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             // We have to return the data unformatted unless we want to change it
             // back in sendMessage.
             return resData.payload.metadata[0];
-          }),
+          })
       );
     }
 
@@ -79,7 +79,7 @@ module.exports = function (defaultFuncs, api, ctx) {
       .post(
         "https://www.facebook.com/message_share_attachment/fromURI/",
         ctx.jar,
-        form,
+        form
       )
       .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
       .then(function (resData) {
@@ -149,7 +149,7 @@ module.exports = function (defaultFuncs, api, ctx) {
             log.warn(
               "sendMessage",
               "Got error 1545012. This might mean that you're not part of the conversation " +
-                threadID,
+                threadID
             );
           }
           return callback(resData);
@@ -189,7 +189,7 @@ module.exports = function (defaultFuncs, api, ctx) {
           threadID,
           threadID.length <= 15,
           messageAndOTID,
-          callback,
+          callback
         );
       else sendContent(form, threadID, !isGroup, messageAndOTID, callback);
     }
@@ -272,11 +272,15 @@ module.exports = function (defaultFuncs, api, ctx) {
         msg.attachment = [msg.attachment];
       }
 
+      if (utils.getType(msg.attachment) !== "Array")
+        msg.attachment = [msg.attachment];
+      if (msg.attachment.every((e) => /_id$/.test(e[0]))) {
+        //console.log(msg.attachment)
+        msg.attachment.map((e) => form[`${e[0]}s`].push(e[1]));
+        return cb();
+      }
       uploadAttachment(msg.attachment, function (err, files) {
-        if (err) {
-          return callback(err);
-        }
-
+        if (err) return callback(err);
         files.forEach(function (file) {
           var key = Object.keys(file);
           var type = key[0]; // image_id, file_id, etc
@@ -304,7 +308,7 @@ module.exports = function (defaultFuncs, api, ctx) {
         if (offset < 0) {
           log.warn(
             "handleMention",
-            'Mention for "' + tag + '" not found in message string.',
+            'Mention for "' + tag + '" not found in message string.'
           );
         }
 
@@ -329,7 +333,7 @@ module.exports = function (defaultFuncs, api, ctx) {
     threadID,
     callback,
     replyToMessage,
-    isGroup,
+    isGroup
   ) {
     typeof isGroup == "undefined" ? (isGroup = null) : "";
     if (
@@ -395,7 +399,7 @@ module.exports = function (defaultFuncs, api, ctx) {
     }
 
     var disallowedProperties = Object.keys(msg).filter(
-      (prop) => !allowedProperties[prop],
+      (prop) => !allowedProperties[prop]
     );
     if (disallowedProperties.length > 0) {
       return callback({
@@ -444,12 +448,12 @@ module.exports = function (defaultFuncs, api, ctx) {
           handleUrl(msg, form, callback, () =>
             handleEmoji(msg, form, callback, () =>
               handleMention(msg, form, callback, () =>
-                send(form, threadID, messageAndOTID, callback, isGroup),
-              ),
-            ),
-          ),
-        ),
-      ),
+                send(form, threadID, messageAndOTID, callback, isGroup)
+              )
+            )
+          )
+        )
+      )
     );
 
     return returnPromise;
