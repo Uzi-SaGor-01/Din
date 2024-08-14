@@ -21,7 +21,10 @@ module.exports = function (defaultFuncs, api, ctx) {
         resolveFunc(data);
       };
     }
-    let count_req = 0;
+
+    ctx.wsReqNumber += 1;
+    let taskNumber = ++ctx.wsTaskNumber;
+
     ctx.mqttClient.publish(
       "/ls_req",
       JSON.stringify({
@@ -42,14 +45,14 @@ module.exports = function (defaultFuncs, api, ctx) {
                 initiating_source: 0,
               }),
               queue_name: threadID,
-              task_id: (Math.random() * 1001) << 0,
+              task_id: taskNumber,
               failure_count: null,
             },
           ],
           epoch_id: utils.generateOfflineThreadingID(),
           version_id: "7191105584331330",
         }),
-        request_id: ++count_req,
+        request_id: ctx.wsReqNumber,
         type: 3,
       }),
       {

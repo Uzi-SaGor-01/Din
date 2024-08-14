@@ -22,7 +22,10 @@ module.exports = function (defaultFuncs, api, ctx) {
         data;
       };
     }
-    let count_req = 0;
+
+    ctx.wsReqNumber += 1;
+    let taskNumber = ++ctx.wsTaskNumber;
+
     var form = JSON.stringify({
       app_id: "2220391788200892",
       payload: JSON.stringify({
@@ -36,14 +39,14 @@ module.exports = function (defaultFuncs, api, ctx) {
               thread_id: threadID,
             }),
             queue_name: "messenger_contact_sharing",
-            task_id: (Math.random() * 1001) << 0,
+            task_id: taskNumber,
             failure_count: null,
           },
         ],
         epoch_id: utils.generateOfflineThreadingID(),
         version_id: "7214102258676893",
       }),
-      request_id: ++count_req,
+      request_id: ctx.wsReqNumber,
       type: 3,
     });
     ctx.mqttClient.publish("/ls_req", form);

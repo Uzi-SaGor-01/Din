@@ -107,6 +107,8 @@ declare module 'dinovn-fca' {
             [color: string]: string
         },
         handleMessageRequest(threadOrThreads: string | string[], accept: boolean, callback: (err?: Error) => void): Promise<void>;
+        httpPost: (url: string, form: any, callback?: (err: Error | null, res: any) => void, notAPI?: boolean) => Promise<any>;
+        httpGet: (url: string, form: any, callback?: (err: Error | null, res: any) => void, notAPI?: boolean) => Promise<any>;
         listen(callback?: (err: Error | null, message: IFCAU_ListenMessage) => void): EventEmitter;
         listenMqtt(callback?: (err: Error | null, message: IFCAU_ListenMessage) => void): EventEmitter & { stopListening: (callback?: () => void) => void };
         logout: (callback?: (err?: Error) => void) => Promise<void>,
@@ -116,6 +118,7 @@ declare module 'dinovn-fca' {
         markAsSeen(seenTimestamp?: number, callback?: (err?: Error) => void): Promise<void>,
         muteThread: (threadID: string, muteSeconds: number, callback?: (err?: Error) => void) => Promise<void>,
         pinMessage: (pinMode: boolean, messageID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
+        postFormData: (url: string, formData: any, callback?: (err: Error | null, res: any) => void) => Promise<any>,
         removeUserFromGroup: (userID: string, threadID: string, callback?: (err?: Error) => void) => Promise<void>,
         resolvePhotoUrl: (photoID: string, callback?: (err: Error | null, url: string) => void) => Promise<string>,
         sendMessage: typeof sendMessage,
