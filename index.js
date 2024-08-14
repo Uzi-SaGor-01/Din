@@ -247,6 +247,7 @@ function buildAPI(globalOptions, html, jar) {
     // HTTP
     "httpGet",
     "httpPost",
+    "postFormData",
   ];
 
   var defaultFuncs = utils.makeDefaults(html, userID, ctx);
